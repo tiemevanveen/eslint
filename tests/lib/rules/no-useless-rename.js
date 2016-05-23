@@ -16,8 +16,17 @@ var ruleTester = new RuleTester();
 
 ruleTester.run("no-useless-rename", rule, {
     valid: [
+        { code: "let {foo} = obj;", parserOptions: { ecmaVersion: 6 } },
         { code: "let {foo: bar} = obj;", parserOptions: { ecmaVersion: 6 } },
         { code: "let {foo: bar, baz: qux} = obj;", parserOptions: { ecmaVersion: 6 } },
+        { code: "let {foo: {bar: baz}} = obj;", parserOptions: { ecmaVersion: 6 } },
+        { code: "let {foo, bar: {baz: qux}} = obj;", parserOptions: { ecmaVersion: 6 } },
+        { code: "function func({foo}) {}", parserOptions: { ecmaVersion: 6 } },
+        { code: "function func({foo: bar}) {}", parserOptions: { ecmaVersion: 6 } },
+        { code: "function func({foo: bar, baz: qux}) {}", parserOptions: { ecmaVersion: 6 } },
+        { code: "({foo}) => {}", parserOptions: { ecmaVersion: 6 } },
+        { code: "({foo: bar}) => {}", parserOptions: { ecmaVersion: 6 } },
+        { code: "({foo: bar, baz: qui}) => {}", parserOptions: { ecmaVersion: 6 } },
         { code: "import * as foo from 'foo';", parserOptions: { ecmaVersion: 6, sourceType: "module" } },
         { code: "import {foo as bar} from 'foo';", parserOptions: { ecmaVersion: 6, sourceType: "module" } },
         { code: "import {foo as bar, baz as qux} from 'foo';", parserOptions: { ecmaVersion: 6, sourceType: "module" } },
@@ -98,25 +107,85 @@ ruleTester.run("no-useless-rename", rule, {
             code: "let {foo: foo} = obj;",
             output: "let {foo} = obj;",
             parserOptions: { ecmaVersion: 6 },
-            errors: ["Destructured assignment foo unnecessarily renamed."]
+            errors: ["Destructuring assignment foo unnecessarily renamed."]
         },
         {
             code: "let {foo: foo, bar: baz} = obj;",
             output: "let {foo, bar: baz} = obj;",
             parserOptions: { ecmaVersion: 6 },
-            errors: ["Destructured assignment foo unnecessarily renamed."]
+            errors: ["Destructuring assignment foo unnecessarily renamed."]
         },
         {
             code: "let {foo: bar, baz: baz} = obj;",
             output: "let {foo: bar, baz} = obj;",
             parserOptions: { ecmaVersion: 6 },
-            errors: ["Destructured assignment baz unnecessarily renamed."]
+            errors: ["Destructuring assignment baz unnecessarily renamed."]
         },
         {
             code: "let {foo: foo, bar: bar} = obj;",
             output: "let {foo, bar} = obj;",
             parserOptions: { ecmaVersion: 6 },
-            errors: ["Destructured assignment foo unnecessarily renamed.", "Destructured assignment bar unnecessarily renamed."]
+            errors: ["Destructuring assignment foo unnecessarily renamed.", "Destructuring assignment bar unnecessarily renamed."]
+        },
+        {
+            code: "let {foo: {bar: bar}} = obj;",
+            output: "let {foo: {bar}} = obj;",
+            parserOptions: { ecmaVersion: 6 },
+            errors: ["Destructuring assignment bar unnecessarily renamed."]
+        },
+        {
+            code: "let {foo: {bar: bar}, baz: baz} = obj;",
+            output: "let {foo: {bar}, baz} = obj;",
+            parserOptions: { ecmaVersion: 6 },
+            errors: ["Destructuring assignment bar unnecessarily renamed.", "Destructuring assignment baz unnecessarily renamed."]
+        },
+        {
+            code: "function func({foo: foo}) {}",
+            output: "function func({foo}) {}",
+            parserOptions: { ecmaVersion: 6 },
+            errors: ["Destructuring assignment foo unnecessarily renamed."]
+        },
+        {
+            code: "function func({foo: foo, bar: baz}) {}",
+            output: "function func({foo, bar: baz}) {}",
+            parserOptions: { ecmaVersion: 6 },
+            errors: ["Destructuring assignment foo unnecessarily renamed."]
+        },
+        {
+            code: "function func({foo: bar, baz: baz}) {}",
+            output: "function func({foo: bar, baz}) {}",
+            parserOptions: { ecmaVersion: 6 },
+            errors: ["Destructuring assignment baz unnecessarily renamed."]
+        },
+        {
+            code: "function func({foo: foo, bar: bar}) {}",
+            output: "function func({foo, bar}) {}",
+            parserOptions: { ecmaVersion: 6 },
+            errors: ["Destructuring assignment foo unnecessarily renamed.", "Destructuring assignment bar unnecessarily renamed."]
+        },
+        {
+            code: "({foo: foo}) => {}",
+            output: "({foo}) => {}",
+            parserOptions: { ecmaVersion: 6 },
+            errors: ["Destructuring assignment foo unnecessarily renamed."]
+        },
+        {
+            code: "({foo: foo, bar: baz}) => {}",
+            output: "({foo, bar: baz}) => {}",
+            parserOptions: { ecmaVersion: 6 },
+            errors: ["Destructuring assignment foo unnecessarily renamed."]
+        },
+        {
+            code: "({foo: bar, baz: baz}) => {}",
+            output: "({foo: bar, baz}) => {}",
+            parserOptions: { ecmaVersion: 6 },
+            errors: ["Destructuring assignment baz unnecessarily renamed."]
+        },
+        {
+            code: "({foo: foo, bar: bar}) => {}",
+            output: "({foo, bar}) => {}",
+            parserOptions: { ecmaVersion: 6 },
+            errors: ["Destructuring assignment foo unnecessarily renamed.", "Destructuring assignment bar unnecessarily renamed."]
         },
         {
             code: "import {foo as foo} from 'foo';",
